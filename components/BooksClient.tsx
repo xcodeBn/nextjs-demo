@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import SearchBar from './SearchBar';
 import { Book, Author } from '@/lib/data';
-
+import {useSearchParams, useRouter, usePathname} from "next/navigation";
 interface BooksClientProps {
   initialBooks: Book[];
   authors: Author[];
@@ -13,13 +13,29 @@ interface BooksClientProps {
 
 export default function BooksClient({ initialBooks, authors }: BooksClientProps) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedGenre, setSelectedGenre] = useState<string>('all');
+  //const [selectedGenre, setSelectedGenre] = useState<string>('all');
+  const searchParams = useSearchParams();
+  const selectedGenre = searchParams.get('genre') || 'all';
+  const router = useRouter();
+    const pathName = usePathname();
+
+  const onGenreSelected = (genre:string)=>{
+      const params = new URLSearchParams(searchParams);
+      if(genre === 'all'){
+          params.delete('genre');
+      }
+      else {
+          params.set('genre', genre);
+      }
+      router.push(`${pathName}?${params.toString()}`);
+  }
 
   // Get unique genres
   const genres = useMemo(() => {
     const genreSet = new Set(initialBooks.map(book => book.genre));
     return ['all', ...Array.from(genreSet)];
   }, [initialBooks]);
+
 
   // Filter books based on search and genre
   const filteredBooks = useMemo(() => {
@@ -48,7 +64,7 @@ export default function BooksClient({ initialBooks, authors }: BooksClientProps)
           {genres.map((genre) => (
             <button
               key={genre}
-              onClick={() => setSelectedGenre(genre)}
+              onClick={() => onGenreSelected(genre)}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                 selectedGenre === genre
                   ? 'bg-zinc-900 dark:bg-zinc-50 text-white dark:text-zinc-900'
