@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import SearchBar from './SearchBar';
+import Pagination from './pagination/Pagination';
 import { Book, Author } from '@/lib/data';
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
@@ -18,7 +19,7 @@ export default function BooksClient({ initialBooks, authors }: BooksClientProps)
     const selectedGenre = searchParams.get('genre') || 'all';
     const router = useRouter();
     const pathName = usePathname();
-    const itemsPerPage = 3;
+    const itemsPerPage = 6;
     const currentPage = Number(searchParams.get('page')) || 1;
 
     const onGenreSelected = (genre: string) => {
@@ -48,7 +49,7 @@ export default function BooksClient({ initialBooks, authors }: BooksClientProps)
     }, [initialBooks]);
 
     // Filter books based on search and genre
-    const allfilteredBooks = useMemo(() => {
+    const allFilteredBooks = useMemo(() => {
         return initialBooks.filter(book => {
             const matchesSearch = book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 authors.find(a => a.id === book.authorId)?.name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -57,14 +58,7 @@ export default function BooksClient({ initialBooks, authors }: BooksClientProps)
         });
     }, [initialBooks, searchQuery, selectedGenre, authors]);
 
-    const totalPages = Math.ceil(allfilteredBooks.length / itemsPerPage);
-    const filteredBooks = allfilteredBooks.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-
-    const handlePageChange = (newPage: number) => {
-        const params = new URLSearchParams(searchParams);
-        params.set('page', newPage.toString());
-        router.push(`${pathName}?${params.toString()}`);
-    };
+    const filteredBooks = allFilteredBooks.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -92,14 +86,10 @@ export default function BooksClient({ initialBooks, authors }: BooksClientProps)
                         >
                             {genre === 'all' ? 'All Genres' : genre}
                         </button>
+
                     ))}
                 </div>
             </div>
-
-            {/* Results count */}
-            <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
-                Showing {filteredBooks.length} of {allfilteredBooks.length} {allfilteredBooks.length === 1 ? 'book' : 'books'}
-            </p>
 
             {filteredBooks.length === 0 ? (
                 <div className="text-center py-12">
@@ -146,28 +136,11 @@ export default function BooksClient({ initialBooks, authors }: BooksClientProps)
                         })}
                     </div>
 
-                    {/* Pagination Controls */}
-                    {totalPages > 1 && (
-                        <div className="flex justify-center items-center gap-2 mt-8">
-                            <button
-                                onClick={() => handlePageChange(currentPage - 1)}
-                                disabled={currentPage === 1}
-                                className="px-4 py-2 rounded-lg bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-50 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-zinc-300 dark:hover:bg-zinc-700 transition-colors"
-                            >
-                                Previous
-                            </button>
-                            <span className="px-4 py-2 text-zinc-900 dark:text-zinc-50">
-                Page {currentPage} of {totalPages}
-              </span>
-                            <button
-                                onClick={() => handlePageChange(currentPage + 1)}
-                                disabled={currentPage >= totalPages}
-                                className="px-4 py-2 rounded-lg bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-50 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-zinc-300 dark:hover:bg-zinc-700 transition-colors"
-                            >
-                                Next
-                            </button>
-                        </div>
-                    )}
+                    <Pagination 
+                        totalItems={allFilteredBooks.length} 
+                        itemsPerPage={itemsPerPage}
+                        resultName={'books'}
+                    />
                 </>
             )}
         </div>
