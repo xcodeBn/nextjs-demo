@@ -1,9 +1,9 @@
-import { getAllBooks, getAllAuthors } from '@/lib/data';
+import { getAllBooksAsync, getAllAuthorsAsync } from '@/lib/data';
 import BooksClient from '@/components/BooksClient';
 
-export default function BooksPage() {
-  const books = getAllBooks();
-  const authors = getAllAuthors();
+export default async function BooksPage() {
+  const books = await getAllBooksAsync();
+  const authors = await getAllAuthorsAsync();
 
   return <BooksClient initialBooks={books} authors={authors} />;
 }

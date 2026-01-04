@@ -15,11 +15,11 @@ export default function AuthorsClient({ authors }: AuthorsProps) {
     const currentPage = Number(searchParams.get('page')) || 1;
     const itemsPerPage = 3;
 
-    // Slice the data for the current page
     const paginatedAuthors = authors.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
+    
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

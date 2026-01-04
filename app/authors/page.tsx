@@ -1,11 +1,11 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { getAllAuthors, getBooksByAuthorId } from '@/lib/data';
+import { getAllAuthorsAsync, getBooksByAuthorId } from '@/lib/data';
 import AuthorsClient from '@/components/AuthorsClient';
 
 
-export default function AuthorsPage() {
-  const authors = getAllAuthors();
+export default async function AuthorsPage() {
+  const authors = await getAllAuthorsAsync();
 
   return (
     <AuthorsClient authors={authors} />
