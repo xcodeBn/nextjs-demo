@@ -10,7 +10,13 @@ export default async function LoginPage(props: {
   async function login(formData: FormData) {
     'use server';
     (await cookies()).set('auth', 'true');
-    const callbackUrl = formData.get('callbackUrl') as string || '/';
+
+    const rawCallbackUrl = formData.get('callbackUrl') as string;
+    const callbackUrl =
+        rawCallbackUrl && rawCallbackUrl.startsWith('/') && !rawCallbackUrl.startsWith('//')
+            ? rawCallbackUrl
+            : '/';
+
     redirect(callbackUrl);
   }
 
